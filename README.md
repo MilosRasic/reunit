@@ -54,7 +54,7 @@ or
 
 ## Basic Usage
 
-Note: all examples use Jest assertions
+**Note:** all examples use Jest assertions
 
 ### Render a component
 
@@ -129,7 +129,7 @@ configure({
 });
 ```
 
-Known limitation: Mocking `useEffect()` like this affects all tests. If you want to run a mix of reunit tests with tests that rely on other libraries, automatic mocking will break `useEffect()` for other libraries. In that case, mock `useEffect()` manually in your reunit tests. If you want to run both unit and integration tests, it might be a good idea to run them as different commands, with different test helper modules.
+**Known limitation:** Mocking `useEffect()` like this affects all tests. If you want to run a mix of reunit tests with tests that rely on other libraries, automatic mocking will break `useEffect()` for other libraries. In that case, mock `useEffect()` manually in your reunit tests. If you want to run both unit and integration tests, it might be a good idea to run them as different commands, with different test helper modules.
 
 For all other situations, the mocks are available as named exports for manual mocking:
 ```
