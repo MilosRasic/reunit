@@ -1,4 +1,4 @@
-const {mockUseEffect, cleanupEffects} = require('./mockUseEffect');
+const { mockUseEffect, cleanupEffects } = require('./mockUseEffect');
 
 describe('mockUseEffect', () => {
 	afterEach(() => {
@@ -38,7 +38,7 @@ describe('mockUseEffect', () => {
 	});
 
 	it('calls the cleanup callback when cleanup() is called', () => {
-		const mockCleanup = sinon.fake()
+		const mockCleanup = sinon.fake();
 		const mockEffect = sinon.fake.returns(mockCleanup);
 
 		mockUseEffect(mockEffect, []);
@@ -60,4 +60,4 @@ describe('mockUseEffect', () => {
 
 		expect(mockEffect).to.have.been.calledTwice;
 	});
-}); 
+});

@@ -5,7 +5,8 @@ function mockUseEffect(effect, deps) {
 	const registeredEffect = effects[effect.toString()];
 
 	const firstRun = !registeredEffect;
-	const depsMissingOrChanged = !deps || registeredEffect && registeredEffect.lastDeps.some((dep, i) => dep !== deps[i]);
+	const depsMissingOrChanged =
+		!deps || (registeredEffect && registeredEffect.lastDeps.some((dep, i) => dep !== deps[i]));
 
 	if (firstRun || depsMissingOrChanged) {
 		const cleanup = effect();

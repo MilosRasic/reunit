@@ -7,7 +7,7 @@ const render = proxyquire('./render', {
 		return {
 			render: mockRender,
 			getRenderOutput: () => mockRenderOutput,
-		}
+		};
 	},
 });
 

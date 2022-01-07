@@ -3,11 +3,15 @@ const ShallowRenderer = require('react-test-renderer/shallow');
 class Wrapper {
 	constructor(renderer, output) {
 		if (renderer && (typeof renderer !== 'object' || !renderer.getRenderOutput)) {
-			throw new Error('Wrapper constructor expects an instance of React Shallow Renderer as the optional first argument');
+			throw new Error(
+				'Wrapper constructor expects an instance of React Shallow Renderer as the optional first argument'
+			);
 		}
 
 		if (output && typeof output !== 'object') {
-			throw new Error('Wrapper constructor expects the output of React Shallow Renderer as the optional second argument');
+			throw new Error(
+				'Wrapper constructor expects the output of React Shallow Renderer as the optional second argument'
+			);
 		}
 
 		if (!renderer && !output) {
@@ -22,8 +26,7 @@ class Wrapper {
 		if (!this.classNames) {
 			if (this.root.props && this.root.props.className) {
 				this.classNames = this.root.props.className.split(' ');
-			}
-			else {
+			} else {
 				this.classNames = [];
 			}
 		}
@@ -92,8 +95,7 @@ class Wrapper {
 		const typeOfType = typeof type;
 
 		// HTML tag
-		if (typeOfType === 'string')
-			return type;
+		if (typeOfType === 'string') return type;
 		// React.Fragment
 		else if (typeOfType === 'symbol') {
 			const symbolNameSplit = type.description.split('.');
@@ -108,15 +110,16 @@ class Wrapper {
 		// React Component wrapped in React.Memo
 		else if (typeOfType === 'object' && type.type) {
 			return type.type.name;
-		}
-		else {
-			console.warn(`reunit encountered a React element type of unsupported format (${typeOfType}) while searching by name. Please report the issue on github, preferably with an example of the component you are trying to test.`);
+		} else {
+			console.warn(
+				`reunit encountered a React element type of unsupported format (${typeOfType}) while searching by name. Please report the issue on github, preferably with an example of the component you are trying to test.`
+			);
 		}
 	}
 
 	findByName(name) {
 		if (typeof name !== 'string') {
-			throw new Error('findByName expects a React Component name or HTML tag name as an argument')
+			throw new Error('findByName expects a React Component name or HTML tag name as an argument');
 		}
 
 		return this._searchChildren(wrapper => wrapper.name === name);
@@ -127,7 +130,10 @@ class Wrapper {
 			throw new Error('findByClass expects a class name as an argument');
 		}
 
-		return this._searchChildren(wrapper => wrapper.classNames.includes(className), wrapper => wrapper._checkClassNames());
+		return this._searchChildren(
+			wrapper => wrapper.classNames.includes(className),
+			wrapper => wrapper._checkClassNames()
+		);
 	}
 
 	findByProp(prop, value) {
@@ -139,7 +145,7 @@ class Wrapper {
 			throw new Error('findByProps expects second argument to be the prop value');
 		}
 
-		return this._searchChildren(wrapper => wrapper.root.props ? wrapper.root.props[prop] === value : false);
+		return this._searchChildren(wrapper => (wrapper.root.props ? wrapper.root.props[prop] === value : false));
 	}
 
 	renderRenderProp(prop, props) {
@@ -166,7 +172,9 @@ class Wrapper {
 
 	update() {
 		if (!this.renderer) {
-			throw new Error('Only a root Wrapper returned by render() can be updated. If you wish to update a child after a state change, update the root Wrapper, then find the child again');
+			throw new Error(
+				'Only a root Wrapper returned by render() can be updated. If you wish to update a child after a state change, update the root Wrapper, then find the child again'
+			);
 		}
 
 		this.root = this.renderer.getRenderOutput();

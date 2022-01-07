@@ -1,43 +1,68 @@
 const React = require('react');
-const {useState} = require('react');
+const { useState } = require('react');
 const ShallowRenderer = require('react-test-renderer/shallow');
 
 const Wrapper = require('./Wrapper');
 
 const render = require('./render');
 
-const mockChild1 = React.createElement('span', {
-	className: 'Child Child1',
-	'data-test-id': 'text-child-1',
-}, 'child 1');
+const mockChild1 = React.createElement(
+	'span',
+	{
+		className: 'Child Child1',
+		'data-test-id': 'text-child-1',
+	},
+	'child 1'
+);
 
-
-const mockChild2 = React.createElement('span', {
+const mockChild2 = React.createElement(
+	'span',
+	{
 		className: 'Child Child2',
 		'data-test-id': 'text-child-2',
-}, 'child 2');
+	},
+	'child 2'
+);
 
-const TestComponent = () => React.createElement('span', {
-	className: 'Parent',
-}, undefined, null, mockChild1, mockChild2);
+const TestComponent = () =>
+	React.createElement(
+		'span',
+		{
+			className: 'Parent',
+		},
+		undefined,
+		null,
+		mockChild1,
+		mockChild2
+	);
 
-const Container = ({children, text}) => () => React.crateElement('div', null, children({text}));
-const MemoedComponent = () => React.createElement('div', { className: 'ThisShouldNotGetRendered'}, 'too deep');
+const Container =
+	({ children, text }) =>
+	() =>
+		React.crateElement('div', null, children({ text }));
+const MemoedComponent = () => React.createElement('div', { className: 'ThisShouldNotGetRendered' }, 'too deep');
 
-const mockContainer = React.createElement(Container, null, ({text}) => React.createElement('div', null, text));
+const mockContainer = React.createElement(Container, null, ({ text }) => React.createElement('div', null, text));
 const mockMemoedComponent = React.createElement(React.memo(MemoedComponent));
 
-const TestComponentWithFuncChildren = () => React.createElement(React.Fragment, null, mockContainer, mockMemoedComponent);
+const TestComponentWithFuncChildren = () =>
+	React.createElement(React.Fragment, null, mockContainer, mockMemoedComponent);
 
-const Count = ({count, inc}) => React.createElement('div', null, count);
+const Count = ({ count, inc }) => React.createElement('div', null, count);
 
 const Counter = () => {
 	const [count, setCount] = useState(0);
 
-	return React.createElement(Count, {
-		count,
-		inc: () => {setCount(count + 1)},
-	}, count)
+	return React.createElement(
+		Count,
+		{
+			count,
+			inc: () => {
+				setCount(count + 1);
+			},
+		},
+		count
+	);
 };
 
 describe('Wrapper', () => {
@@ -185,7 +210,7 @@ describe('Wrapper', () => {
 	it('can render a render prop', () => {
 		const wrapper = render(React.createElement(TestComponentWithFuncChildren));
 
-		const children = wrapper.findByName('Container').at(0).renderRenderProp('children', {text: 'test'});
+		const children = wrapper.findByName('Container').at(0).renderRenderProp('children', { text: 'test' });
 
 		const theDiv = children.findByName('div');
 		expect(theDiv).to.have.lengthOf(1);
@@ -195,7 +220,9 @@ describe('Wrapper', () => {
 	it('throws if the render prop is not found', () => {
 		const wrapper = render(React.createElement(TestComponentWithFuncChildren));
 
-		expect(() => wrapper.findByName('Container').at(0).renderRenderProp('propThatDoesNotExist', {text: 'test'})).to.throw();
+		expect(() =>
+			wrapper.findByName('Container').at(0).renderRenderProp('propThatDoesNotExist', { text: 'test' })
+		).to.throw();
 	});
 
 	it('throws if the render prop is not a function', () => {
@@ -207,7 +234,7 @@ describe('Wrapper', () => {
 	it('throws if render prop name is not a string', () => {
 		const wrapper = render(React.createElement(TestComponentWithFuncChildren));
 
-		expect(() => wrapper.findByName('Container').at(0).renderRenderProp({}, {text: 'test'})).to.throw();
+		expect(() => wrapper.findByName('Container').at(0).renderRenderProp({}, { text: 'test' })).to.throw();
 	});
 
 	it('throws if render prop props are not an object', () => {

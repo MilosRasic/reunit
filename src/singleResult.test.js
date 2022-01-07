@@ -19,4 +19,4 @@ describe('singleResult', () => {
 
 		expect(() => singleResult(notAnArray)).to.throw();
 	});
-}); 
+});
