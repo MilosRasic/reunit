@@ -217,3 +217,7 @@ wrapper.update();
 
 expect(wrapper.findByName('Count').at(0).props.count).toBe(1);
 ```
+
+## Contributing
+
+reunit is still in early phase of initial development. Please post your idea as an issue so that we can sync on whether and how to best implement it. 
