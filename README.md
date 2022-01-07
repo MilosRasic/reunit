@@ -35,6 +35,7 @@ reunit works on the assumption that only the following is considered a unit test
 - example tests
 - finding children by component? So far looks like it's not needed
 - finding children by a configurable test ID
+- TS typings
 
 ## Won't do
 - real DOM rendering in `jsdom`
@@ -43,7 +44,8 @@ reunit works on the assumption that only the following is considered a unit test
 - selectors
 - finding children by text or role
 - support for older versions of React
-
+- rewrite in TS, WASM or whatever
+- 
 ## Installing
 
 `yarn add --dev reunit`
