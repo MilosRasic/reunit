@@ -1,13 +1,21 @@
 const ShallowRenderer = require('react-test-renderer/shallow');
 
 class Wrapper {
-	constructor(renderer) {
-		if (typeof renderer !== 'object' || !renderer.getRenderOutput) {
-			throw new Error('Wrapper constructor expects an instance of React Shallow Renderer as argument');
+	constructor(renderer, output) {
+		if (renderer && (typeof renderer !== 'object' || !renderer.getRenderOutput)) {
+			throw new Error('Wrapper constructor expects an instance of React Shallow Renderer as the optional first argument');
 		}
 
-		this.root = renderer.getRenderOutput();
+		if (output && typeof output !== 'object') {
+			throw new Error('Wrapper constructor expects the output of React Shallow Renderer as the optional second argument');
+		}
+
+		if (!renderer && !output) {
+			throw new Error('Wrapper must be constructed with at least a renderer or render output');
+		}
+
 		this.renderer = renderer;
+		this.root = output || renderer.getRenderOutput();
 	}
 
 	_checkClassNames() {
@@ -37,14 +45,14 @@ class Wrapper {
 			if (this.root.props.children.forEach) {
 				this.root.props.children.forEach(child => {
 					if (child && typeof child === 'object') {
-						const childWrapper = new Wrapper(child);
+						const childWrapper = new Wrapper(null, child);
 						result.push(...childWrapper._searchChildren(check, preCheck));
 					}
 				});
 			}
 			// single child not in an array
 			else if (this.root.props.children.type) {
-				const childWrapper = new Wrapper(this.root.props.children);
+				const childWrapper = new Wrapper(null, this.root.props.children);
 				result.push(...childWrapper._searchChildren(check, preCheck));
 			}
 		}
@@ -108,7 +116,7 @@ class Wrapper {
 
 	findByName(name) {
 		if (typeof name !== 'string') {
-			throw new Error('findByName expects a React Component or HTML tag name as an argument')
+			throw new Error('findByName expects a React Component name or HTML tag name as an argument')
 		}
 
 		return this._searchChildren(wrapper => wrapper.name === name);
@@ -153,7 +161,15 @@ class Wrapper {
 			throw new Error(`Render prop ${prop} found but is not a function`);
 		}
 
-		return new Wrapper(renderProp(props));
+		return new Wrapper(null, renderProp(props));
+	}
+
+	update() {
+		if (!this.renderer) {
+			throw new Error('Only a root Wrapper returned by render() can be updated. If you wish to update a child after a state change, update the root Wrapper, then find the child again');
+		}
+
+		this.root = this.renderer.getRenderOutput();
 	}
 }
 
