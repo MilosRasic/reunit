@@ -1,6 +1,6 @@
 {
 	"name": "reunit",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "Library for unit testing React components",
 	"main": "index.js",
 	"scripts": {
