@@ -14,6 +14,10 @@ class Wrapper {
 			);
 		}
 
+		if (proband && !(proband instanceof Wrapper)) {
+			throw new Error('Wrapper constructor expects the third argument to be an instance of Wrapper');
+		}
+
 		if (!renderer && !output) {
 			throw new Error('Wrapper must be constructed with at least a renderer or render output');
 		}
@@ -182,6 +186,14 @@ class Wrapper {
 	}
 
 	callProp(prop, ...args) {
+		if (!prop || typeof prop !== 'string') {
+			throw new Error('callProp() expect the first argument to be the name of the prop to call as a function');
+		}
+
+		if (typeof this.props[prop] !== 'function') {
+			throw new Error(`callProp() can only call a function prop, but prop ${prop} is ${typeof this.props[prop]}`);
+		}
+
 		this.props[prop].call(null, ...args);
 
 		const proband = this.proband || this;

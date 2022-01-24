@@ -112,6 +112,14 @@ describe('Wrapper', () => {
 		expect(() => new Wrapper()).to.throw();
 	});
 
+	it('throws if proband is not a Wrapper', () => {
+		const renderer = new ShallowRenderer();
+		renderer.render(React.createElement(TestComponent));
+		const output = renderer.getRenderOutput();
+
+		expect(() => new Wrapper(null, output, {})).to.throw();
+	});
+
 	it('can find children by HTML tag name', () => {
 		const wrapper = render(React.createElement(TestComponent));
 		const spans = wrapper.findByName('span');
@@ -304,5 +312,29 @@ describe('Wrapper', () => {
 		count.callProp('inc', 5);
 
 		expect(wrapper.findByName('Count').at(0).props.count).to.equal(5);
+	});
+
+	it('throws if callProp() method is called with no arguments', () => {
+		const wrapper = render(React.createElement(Counter));
+
+		const count = wrapper.findByName('Count').at(0);
+
+		expect(() => count.callProp()).to.throw();
+	});
+
+	it('throws if callProp() is called with a wrong type of prop name', () => {
+		const wrapper = render(React.createElement(Counter));
+
+		const count = wrapper.findByName('Count').at(0);
+
+		expect(() => count.callProp({})).to.throw();
+	});
+
+	it('throws if callProp() is called for a prop that is not a function', () => {
+		const wrapper = render(React.createElement(Counter));
+
+		const count = wrapper.findByName('Count').at(0);
+
+		expect(() => count.callProp('count')).to.throw();
 	});
 });
