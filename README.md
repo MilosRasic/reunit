@@ -30,7 +30,6 @@ reunit works on the assumption that only the following is considered a unit test
 - `useRef()`
 - classy components
 - Context?
-- classy components
 - dumping output as JSX for easier debugging
 - example tests
 - finding children by component? So far looks like it's not needed
@@ -204,14 +203,14 @@ count.props.increment();
 expect(count.props.count).toBe(1);
 ```
 
-Because after we call `increment()` which we can guess increments the `Counter` state by 1, the wrappers stil hold output of the initial render. To get a test case that works as expected, we have to update the root wrapper, and find the `Count` element again. 
+Because after we call `increment()` which we can guess increments the `Counter` state by 1, the wrappers still hold output of the initial render. To get a test case that works as expected, we have to update the root wrapper, and find the `Count` element again. 
 
 ```
 const wrapper = render(<Counter />);
 
 const count = singleResult(wrapper.findByName('Count'));
 
-expect(count.props.count).toBe(1);
+expect(count.props.count).toBe(0);
 
 count.props.increment();
 
@@ -219,6 +218,29 @@ wrapper.update();
 
 expect(wrapper.findByName('Count').at(0).props.count).toBe(1);
 ```
+
+Since updating state is a frequent reason to reach for function props and call them in unit testing, reunit offers a a helper method `callProp()` on the wrapper, which calls a function prop and immediately updates the topmost wrapper. This is simply a more concise way to call a a prop and update the wrapper. The above example would look like this:
+
+```
+const wrapper = render(<Counter />);
+
+const count = singleResult(wrapper.findByName('Count'));
+
+expect(count.props.count).toBe(0);
+
+count.callProp('increment');
+
+expect(wrapper.findByName('Count').at(0).props.count).toBe(1);
+```
+
+`callProp()` can also pass arguments to the function prop it's calling. Simply add them as arguments to the `callProp()` call. For example, if the above `increment` prop took a `step` argument that told it by how much to increment the counter, we could call it like this:
+
+```
+count.callProp('increment', 5);
+
+expect(wrapper.findByName('Count').at(0).props.count).toBe(5);
+```
+
 
 ## Contributing
 
