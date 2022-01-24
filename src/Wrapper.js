@@ -1,7 +1,7 @@
 const ShallowRenderer = require('react-test-renderer/shallow');
 
 class Wrapper {
-	constructor(renderer, output) {
+	constructor(renderer, output, proband) {
 		if (renderer && (typeof renderer !== 'object' || !renderer.getRenderOutput)) {
 			throw new Error(
 				'Wrapper constructor expects an instance of React Shallow Renderer as the optional first argument'
@@ -20,6 +20,7 @@ class Wrapper {
 
 		this.renderer = renderer;
 		this.root = output || renderer.getRenderOutput();
+		this.proband = proband;
 	}
 
 	_checkClassNames() {
@@ -32,7 +33,7 @@ class Wrapper {
 		}
 	}
 
-	_searchChildren(check, preCheck) {
+	_searchChildren(check, preCheck, proband = this) {
 		const result = [];
 
 		if (preCheck) {
@@ -48,15 +49,15 @@ class Wrapper {
 			if (this.root.props.children.forEach) {
 				this.root.props.children.forEach(child => {
 					if (child && typeof child === 'object') {
-						const childWrapper = new Wrapper(null, child);
-						result.push(...childWrapper._searchChildren(check, preCheck));
+						const childWrapper = new Wrapper(null, child, proband);
+						result.push(...childWrapper._searchChildren(check, preCheck, proband));
 					}
 				});
 			}
 			// single child not in an array
 			else if (this.root.props.children.type) {
-				const childWrapper = new Wrapper(null, this.root.props.children);
-				result.push(...childWrapper._searchChildren(check, preCheck));
+				const childWrapper = new Wrapper(null, this.root.props.children, proband);
+				result.push(...childWrapper._searchChildren(check, preCheck, proband));
 			}
 		}
 
@@ -178,6 +179,13 @@ class Wrapper {
 		}
 
 		this.root = this.renderer.getRenderOutput();
+	}
+
+	callProp(prop, ...args) {
+		this.props[prop].call(null, ...args);
+
+		const proband = this.proband || this;
+		proband.update();
 	}
 }
 

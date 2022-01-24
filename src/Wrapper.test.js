@@ -57,8 +57,8 @@ const Counter = () => {
 		Count,
 		{
 			count,
-			inc: () => {
-				setCount(count + 1);
+			inc: (step = 1) => {
+				setCount(count + step);
 			},
 		},
 		count
@@ -74,6 +74,7 @@ describe('Wrapper', () => {
 
 		expect(wrapper.renderer).to.equal(renderer);
 		expect(wrapper.root).to.equal(output);
+		expect(wrapper.proband).to.be.undefined;
 	});
 
 	it('can be constructed with an instance of shallow renderer only', () => {
@@ -84,16 +85,19 @@ describe('Wrapper', () => {
 
 		expect(wrapper.renderer).to.equal(renderer);
 		expect(wrapper.root).to.equal(output);
+		expect(wrapper.proband).to.be.undefined;
 	});
 
-	it('can be constructed with shallow rendering output only (think of the children)', () => {
+	it('can be constructed with shallow rendering output and a proband (think of the children)', () => {
 		const renderer = new ShallowRenderer();
 		renderer.render(React.createElement(TestComponent));
 		const output = renderer.getRenderOutput();
-		const wrapper = new Wrapper(null, output);
+		const proband = new Wrapper(null, output);
+		const wrapper = new Wrapper(null, output, proband);
 
 		expect(wrapper.renderer).to.be.null;
 		expect(wrapper.root).to.equal(output);
+		expect(wrapper.proband).to.equal(proband);
 	});
 
 	it('throws if renderer passed to constructor is invalid', () => {
@@ -113,6 +117,9 @@ describe('Wrapper', () => {
 		const spans = wrapper.findByName('span');
 
 		expect(spans).to.have.lengthOf(3);
+		expect(spans.at(0).proband).to.be.undefined;
+		expect(spans.at(1).proband).to.equal(wrapper);
+		expect(spans.at(2).proband).to.equal(wrapper);
 	});
 
 	it('throws if trying to find by tag name that is not a string', () => {
@@ -132,6 +139,7 @@ describe('Wrapper', () => {
 		const children = wrapper.findByClass('Child');
 
 		expect(children).to.have.lengthOf(2);
+		expect(children.at(0).proband).to.equal(wrapper);
 	});
 
 	it('throws if trying to find by class that is not a string', () => {
@@ -151,6 +159,7 @@ describe('Wrapper', () => {
 		const child = wrapper.findByProp('data-test-id', 'text-child-1');
 
 		expect(child).to.have.lengthOf(1);
+		expect(child.at(0).proband).to.equal(wrapper);
 	});
 
 	it('throws if trying to find by a prop and prop name is not a string', () => {
@@ -271,5 +280,29 @@ describe('Wrapper', () => {
 		const child = wrapper.findByClass('Child1').at(0);
 
 		expect(() => child.update()).to.throw();
+	});
+
+	it('can call a function prop and update the proband', () => {
+		const wrapper = render(React.createElement(Counter));
+
+		const count = wrapper.findByName('Count').at(0);
+
+		expect(count.props.count).to.equal(0);
+
+		count.callProp('inc');
+
+		expect(wrapper.findByName('Count').at(0).props.count).to.equal(1);
+	});
+
+	it('can call a function prop with arguments', () => {
+		const wrapper = render(React.createElement(Counter));
+
+		const count = wrapper.findByName('Count').at(0);
+
+		expect(count.props.count).to.equal(0);
+
+		count.callProp('inc', 5);
+
+		expect(wrapper.findByName('Count').at(0).props.count).to.equal(5);
 	});
 });
