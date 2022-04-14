@@ -188,6 +188,32 @@ describe('Wrapper', () => {
 		expect(wrapper.findByProp('data-test-id', 'text-child-3')).to.have.lengthOf(0);
 	});
 
+	it('can find children by testId', () => {
+		const wrapper = render(React.createElement(TestComponent));
+		const child = wrapper.findByTestId('text-child-1');
+
+		expect(child).to.have.lengthOf(1);
+		expect(child.at(0).proband).to.equal(wrapper);
+	});
+
+	it('throws if trying to find by a test ID and the test ID is not a string', () => {
+		const wrapper = render(React.createElement(TestComponent));
+
+		expect(() => wrapper.findByTestId(3457)).to.throw();
+	});
+
+	it('throws if trying to find by a test ID and the test ID is an empty string', () => {
+		const wrapper = render(React.createElement(TestComponent));
+
+		expect(() => wrapper.findByTestId('')).to.throw();
+	});
+
+	it('returns an empty array if no elements are found by test ID', () => {
+		const wrapper = render(React.createElement(TestComponent));
+
+		expect(wrapper.findByTestId('text-child-3')).to.have.lengthOf(0);
+	});
+
 	it('can return props of the wrapper element', () => {
 		const wrapper = render(React.createElement(TestComponent));
 

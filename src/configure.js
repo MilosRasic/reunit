@@ -1,6 +1,10 @@
 const { mockUseEffect, cleanupEffects } = require('./mockUseEffect');
 
-function configure({ mocker }) {
+const config = {
+	testId: 'data-test-id',
+};
+
+function configure({ mocker, testId }) {
 	if (mocker) {
 		const mockerCount = Object.keys(mocker).length;
 		if (mockerCount !== 1) {
@@ -17,9 +21,24 @@ function configure({ mocker }) {
 		}
 	}
 
+	if (testId) {
+		if (typeof testId !== 'string') {
+			throw new Error(`test ID should be a string, but got ${typeof testId}`);
+		}
+
+		config.testId = testId;
+	}
+
 	afterEach(() => {
 		cleanupEffects();
 	});
 }
 
-module.exports = configure;
+function getTestId() {
+	return config.testId;
+}
+
+module.exports = {
+	configure,
+	getTestId,
+};

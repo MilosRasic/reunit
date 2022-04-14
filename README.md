@@ -11,11 +11,13 @@ Unit tests are not a bad, obsolete alternative to integration and end-to-end tes
 Unit tests are also the best way to do Test Driven Development (TDD), a development technique that probably has the most univerally beneficial effect on our engineering skills, regardless of our seniority level, programming languages we use or the type of software we are working on.
 
 reunit works on the assumption that only the following is considered a unit test:
+
 - Only the component under test is tested. All non-trivial direct dependencies are mocked out in a minimal fashion, so that mocks provide only the functionality needed by the component under test.
 - Our test cases should shallow render the component under test with different combinations of props and assert the output. The output is what the function component returns or the return of `render()` method of a classy component.
 - Additionally, test cases should call the callbacks the component under test provides to its children as props and assert the effects of those calls.
 
 ## What's done and supported
+
 - functional components
 - `useEffect()`
 - manually upading a shallow render after a state change
@@ -25,6 +27,7 @@ reunit works on the assumption that only the following is considered a unit test
 - manually rendering a render prop
 
 ## To be done
+
 - better docs
 - `useLayoutEffect()`
 - `useRef()`
@@ -33,10 +36,10 @@ reunit works on the assumption that only the following is considered a unit test
 - dumping output as JSX for easier debugging
 - example tests
 - finding children by component? So far looks like it's not needed
-- finding children by a configurable test ID
 - TS typings
 
 ## Won't do
+
 - real DOM rendering in `jsdom`
 - directly setting state
 - automatic render prop rendering (we don't know which prop is a render prop or what arguments to pass)
@@ -44,7 +47,8 @@ reunit works on the assumption that only the following is considered a unit test
 - finding children by text or role
 - support for older versions of React
 - rewrite in TS, WASM or whatever
-- 
+-
+
 ## Installing
 
 `yarn add --dev reunit`
@@ -72,26 +76,50 @@ const wrapper = render(<BuyButton price="24.99"/>);
 To perform assetions on the output of our shallow render, we have to somehow reach for specific elements rendered by the component.
 
 Finding by HTML tag name or React component name:
+
 ```
 const spans = wrapper.findByName('span');
 ```
 
 Finding by class:
+
 ```
 const price = wrapper.findByClass('Price');
 ```
 
 Finding by prop value:
+
 ```
 const price = wrapper.findByProp('data-test-id', 'buy-button-price-text');
 ```
 
+Finding by test ID:
+
+```
+const price = wrapper.findByTestId('buy-button-price-text');
+```
+
+Test ID prop is considered to be `data-test-id` by default. It can be changed in the `configure()` call, like this:
+
+```
+import {configure} from 'reunit';
+
+configure({
+  mocker: {
+    jest,
+  },
+  testId: 'data-testId',
+});
+```
+
 All find methods return an array of Wrappers, even if there's only one or no results. In case of no results, the array will be empty. We can assert the existence of exactly one element like this:
+
 ```
 expect(price).toHaveLength(1);
 ```
 
 If we want to assert the presence of exactly one element and get a reference to it for further assertions, reunit offers a `singleResult()` helper.
+
 ```
 import { render, singleResult } from 'reunit';
 
@@ -120,6 +148,7 @@ Note: `Array.at()` is the more elegant alternative to square brackets, expeciall
 `useEffect()` is stubbed out by React Shallow Renderer which reunit relies on for shallow rendering, but it's still very important for functionality of our components. reunit works around this by offering a way to mock useEffect() so that our effects are executed. The mock does not copmletely implement the behavior of React, but it's faithful enough for testing a single component in isolation.
 
 A way to automatically mock `useEffect()` is provided for Jest and might be provided for other test runners or mocking libraries in the future. To automatically enable `useEffect()` in all tests, simply add this to your test helper module:
+
 ```
 import {configure} from 'reunit';
 
@@ -133,6 +162,7 @@ configure({
 **Known limitation:** Mocking `useEffect()` like this affects all tests. If you want to run a mix of reunit tests with tests that rely on other libraries, automatic mocking will break `useEffect()` for other libraries. In that case, mock `useEffect()` manually in your reunit tests. If you want to run both unit and integration tests, it might be a good idea to run them as different commands, with different test helper modules.
 
 For all other situations, the mocks are available as named exports for manual mocking:
+
 ```
 import { mockUseEffect, cleanupEffects } from 'reunit';
 
@@ -169,6 +199,7 @@ reunit is not able to recognize which prop is a render prop, and even if it coul
 `Wrapper.renderRenderProp(propName, props)` offers a way to call the render prop function and get a `Wrapper` wrapping the rendered elements as a result.
 
 For example, for a copmonent written like this...
+
 ```
 const Details => (
   <ScrollContainer>
@@ -178,6 +209,7 @@ const Details => (
 ```
 
 ...we could render the `children` prop like this:
+
 ```
 const mockOnFocused = jest.fn();
 
@@ -191,6 +223,7 @@ wrapper.findByName('ScrollContainer').at(0).renderRenderProp('children', { onFoc
 State changes are an important part of our components that should be unit tested as well. After we call a function that caues a state change, reunit offers a `Wrapper.update()` method that updates the shallow render output to the latest state.
 
 For example, this test would fail:
+
 ```
 const wrapper = render(<Counter />);
 
@@ -203,7 +236,7 @@ count.props.increment();
 expect(count.props.count).toBe(1);
 ```
 
-Because after we call `increment()` which we can guess increments the `Counter` state by 1, the wrappers still hold output of the initial render. To get a test case that works as expected, we have to update the root wrapper, and find the `Count` element again. 
+Because after we call `increment()` which we can guess increments the `Counter` state by 1, the wrappers still hold output of the initial render. To get a test case that works as expected, we have to update the root wrapper, and find the `Count` element again.
 
 ```
 const wrapper = render(<Counter />);
@@ -241,7 +274,6 @@ count.callProp('increment', 5);
 expect(wrapper.findByName('Count').at(0).props.count).toBe(5);
 ```
 
-
 ## Contributing
 
-reunit is still in early phase of initial development. Please post your idea as an issue so that we can sync on whether and how to best implement it. 
+reunit is still in early phase of initial development. Please post your idea as an issue so that we can sync on whether and how to best implement it.

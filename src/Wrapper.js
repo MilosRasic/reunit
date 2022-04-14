@@ -1,5 +1,7 @@
 const ShallowRenderer = require('react-test-renderer/shallow');
 
+const { getTestId } = require('./configure');
+
 class Wrapper {
 	constructor(renderer, output, proband) {
 		if (renderer && (typeof renderer !== 'object' || !renderer.getRenderOutput)) {
@@ -143,14 +145,26 @@ class Wrapper {
 
 	findByProp(prop, value) {
 		if (typeof prop !== 'string') {
-			throw new Error('findByProps expects prop name to be a string');
+			throw new Error('findByProp expects prop name to be a string');
 		}
 
 		if (typeof value === 'undefined') {
-			throw new Error('findByProps expects second argument to be the prop value');
+			throw new Error('findByProp expects second argument to be the prop value');
 		}
 
 		return this._searchChildren(wrapper => (wrapper.root.props ? wrapper.root.props[prop] === value : false));
+	}
+
+	findByTestId(value) {
+		if (typeof value !== 'string') {
+			throw new Error('findByTestId expects the test ID to be a string');
+		}
+
+		if (!value) {
+			throw new Error('findByTestId expects a non-empty string as an argument');
+		}
+
+		return this.findByProp(getTestId(), value);
 	}
 
 	renderRenderProp(prop, props) {

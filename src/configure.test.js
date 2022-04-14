@@ -1,5 +1,5 @@
 const mockMockUseEffect = sinon.fake();
-const configure = proxyquire('./configure', {
+const { configure, getTestId } = proxyquire('./configure', {
 	'./mockUseEffect': {
 		mockUseEffect: mockMockUseEffect,
 	},
@@ -45,6 +45,28 @@ describe('configure', () => {
 		expect(() =>
 			configure({
 				mocker: {},
+			})
+		).to.throw();
+	});
+
+	it('returns data-test-id as default test ID', () => {
+		expect(getTestId()).to.equal('data-test-id');
+	});
+
+	it('can be configured with explicitly set test ID', () => {
+		const MOCK_TEST_ID = 'my-special-test-id';
+
+		configure({ testId: MOCK_TEST_ID });
+
+		expect(getTestId()).to.equal(MOCK_TEST_ID);
+	});
+
+	it('throws if given a testId that is not a string', () => {
+		const MOCK_BAD_TEST_ID = 23456;
+
+		expect(() =>
+			configure({
+				testId: MOCK_BAD_TEST_ID,
 			})
 		).to.throw();
 	});
